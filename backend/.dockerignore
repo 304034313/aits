@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+*.pyo
+.env
+db.sqlite3
+logs/
+media/
+chroma_db/
+httprunner_workspace/
+playwright_workspace/
+temp/
+cache/
+.idea/
+.pytest_cache/
+allure-2.23.0/

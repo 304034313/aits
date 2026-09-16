@@ -1,0 +1,124 @@
+# AITS 核心栈（macOS / Linux 云服务器 Docker 部署）
+# Windows 教学班请继续使用 一键安装AITS.bat
+# 镜像版本见 docker/versions.env（与 tools/installers/versions.json 对齐）
+
+services:
+  redis:
+    image: ${REDIS_IMAGE:-redis:5.0.14-alpine}
+    container_name: aits-redis
+    restart: unless-stopped
+    volumes:
+      - aits_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.12-bookworm}
+        AITS_TORCH_VARIANT: ${AITS_TORCH_VARIANT:-cpu}
+        AITS_USE_CHINA_MIRROR: ${AITS_USE_CHINA_MIRROR:-1}
+        AITS_APT_MIRROR: ${AITS_APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
+        PLAYWRIGHT_DOWNLOAD_HOST: ${PLAYWRIGHT_DOWNLOAD_HOST:-https://npmmirror.com/mirrors/playwright}
+    container_name: aits-backend
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      AITS_PLAYWRIGHT_HEADLESS: "1"
+      SQLITE_DB_PATH: /app/backend/data/db.sqlite3
+      MEDIA_ROOT: /app/backend/data/media
+      CHROMA_PERSIST_DIR: /app/backend/data/chroma_db
+    command: ["python", "run_asgi.py"]
+    volumes:
+      - aits_data:/app/backend/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/admin/login/"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 40s
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.12-bookworm}
+        AITS_TORCH_VARIANT: ${AITS_TORCH_VARIANT:-cpu}
+        AITS_USE_CHINA_MIRROR: ${AITS_USE_CHINA_MIRROR:-1}
+        AITS_APT_MIRROR: ${AITS_APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
+        PLAYWRIGHT_DOWNLOAD_HOST: ${PLAYWRIGHT_DOWNLOAD_HOST:-https://npmmirror.com/mirrors/playwright}
+    container_name: aits-celery-worker
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      AITS_PLAYWRIGHT_HEADLESS: "1"
+      SQLITE_DB_PATH: /app/backend/data/db.sqlite3
+      MEDIA_ROOT: /app/backend/data/media
+      CHROMA_PERSIST_DIR: /app/backend/data/chroma_db
+    command: ["celery", "-A", "aits_backend", "worker", "--loglevel=info"]
+    volumes:
+      - aits_data:/app/backend/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.12-bookworm}
+        AITS_TORCH_VARIANT: ${AITS_TORCH_VARIANT:-cpu}
+        AITS_USE_CHINA_MIRROR: ${AITS_USE_CHINA_MIRROR:-1}
+        AITS_APT_MIRROR: ${AITS_APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
+        PLAYWRIGHT_DOWNLOAD_HOST: ${PLAYWRIGHT_DOWNLOAD_HOST:-https://npmmirror.com/mirrors/playwright}
+    container_name: aits-celery-beat
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      SQLITE_DB_PATH: /app/backend/data/db.sqlite3
+    command: ["celery", "-A", "aits_backend", "beat", "--loglevel=info"]
+    volumes:
+      - aits_data:/app/backend/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_IMAGE: ${NODE_IMAGE:-node:24.16.0-bookworm}
+        NGINX_IMAGE: ${NGINX_IMAGE:-nginx:1.27-alpine}
+        VITE_AITS_PACK_PROFILE: ${VITE_AITS_PACK_PROFILE:-}
+    container_name: aits-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  aits_redis_data:
+  aits_data:

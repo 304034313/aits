@@ -1,0 +1,67 @@
+# ========================================
+# AITS v1 .gitignore
+# ========================================
+
+# 1. 本机密钥与安装状态（严禁上传）
+backend/.env
+frontend/.env
+.env.docker
+.aits-conda-root
+backend/.aits-installed
+
+# 2. 本机数据库与 AI/RAG 运行时数据
+backend/db.sqlite3
+backend/db.sqlite3-*
+backend/chroma_db/
+
+# 3. Python 缓存
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+
+# 4. 后端运行时目录
+backend/logs/
+backend/media/
+backend/temp/
+backend/cache/
+backend/httprunner_workspace/
+backend/playwright_workspace/
+backend/allure-2.23.0/
+backend/.idea/
+
+# 5. 前端依赖与构建产物
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# 6. 日志与调试输出
+*.log
+install.log
+backend/console*.log
+backend/debug-*.log
+
+# 7. 离线安装包与大体积分发包（走网盘，不进 Git）
+tools/installers/*.exe
+tools/installers/*.msi
+tools/miniconda3/
+tools/node/
+tools/redis/
+tools/monitor/*.exe
+tools/monitor/*.msi
+tools/monitor/*.zip
+tools/monitor/prometheus/
+tools/monitor/runtime/
+lemon-aits.zip
+*.zip
+
+# 8. 开发过程临时笔记（可选保留本地）
+backend/register_page*.md
+backend/login_snapshot.md
+
+# 9. IDE / 系统文件
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
