@@ -15,7 +15,8 @@ function Write-OfflineHint {
     Write-Host ' 请先下载离线依赖包后再安装' -ForegroundColor Yellow
     Write-Host '====================================================' -ForegroundColor Yellow
     Write-Host ''
-    Write-Host ' 1. 从网盘下载 AITS Windows 离线依赖包: Miniconda, Node.js, Redis'
+    Write-Host ' 1. 从百度网盘下载 AITS Windows 离线依赖包: Miniconda, Node.js, Redis'
+    Write-Host '    链接: https://pan.baidu.com/s/192I_P15dfgY910cwg8AzeQ  提取码: 369c'
     Write-Host ' 2. 将三个安装包放入:'
     Write-Host "    $dir"
     Write-Host '    或项目 tools 目录'
@@ -40,7 +41,8 @@ Write-Host "   $installersDir"
 Write-Host '   或 tools 目录'
 Write-Host ''
 Write-Host ' 需包含 Miniconda, Node.js, Redis 三个安装包'
-Write-Host ' 若尚未下载, 请先从网盘获取离线依赖包'
+Write-Host ' 若尚未下载, 请先从百度网盘获取离线依赖包:'
+Write-Host '   https://pan.baidu.com/s/192I_P15dfgY910cwg8AzeQ  提取码: 369c'
 Write-Host ''
 
 $answer = Read-Host '是否已完成上述准备? 请输入 yes 继续'

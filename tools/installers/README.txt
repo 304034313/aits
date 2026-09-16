@@ -9,4 +9,6 @@ Windows 离线安装依赖包请放入本目录：
 
 versions.json 可选；缺失时使用内置默认文件名。
 
-若目录为空，请先从网盘下载离线依赖包，再运行项目根目录「一键安装AITS.bat」。
+若目录为空，请先从百度网盘下载离线依赖包，再运行项目根目录「一键安装AITS.bat」：
+  链接: https://pan.baidu.com/s/192I_P15dfgY910cwg8AzeQ
+  提取码: 369c
