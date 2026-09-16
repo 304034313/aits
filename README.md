@@ -236,4 +236,8 @@ Web UI 自动化、App 移动端测试、性能测试、AI 智能技能、缺陷
 
 ## License
 
-本项目基于 [MIT License](./LICENSE) 开源，版权归柠檬班所有。
+本项目基于 [GNU Affero General Public License v3.0](./LICENSE)（AGPL-3.0）发布，版权归柠檬班所有。
+
+- 你可以自由使用、修改和分发本软件
+- 若你修改后**分发**给他人，或**通过网络提供服务**（如 SaaS），须以 AGPL-3.0 开源你的修改版本
+- 商业使用如不希望开源衍生代码，请联系柠檬班获取单独商业授权：<http://www.lemonban.com>
